@@ -12,6 +12,7 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
 **CATAT:** Jalankan skrip ini di direktori defaultnya.
 
 # OPSI
+```
 -t:                                                                            
     Target direktori yang ingin ditempati.                                
     Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
@@ -24,8 +25,12 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
 -r:
     Targetkan semua word/kata yang cocok.
     skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
+```
 # CARA KERJA SKRIP
-    ```./multi-rename [-t] "target direktori" [-a] [-r] "nama file" "nama baru"```
+
+    ```
+    ./multi-rename [-t] "target direktori" [-a] [-r] "nama file" "nama baru"
+    ```
 atau:
     ```
         ./multi-rename [-t] "target direktori" [-d] [-a] [-r] "nama file"
