@@ -27,10 +27,8 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
     skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
 ```
 # CARA KERJA SKRIP
-    ```
     ./multi-rename [-t] "target direktori" [-a] [-r] "nama file" "nama baru"
     ./multi-rename [-t] "target direktori" [-d] [-a] [-r] "nama file"
-    ```
 
 Skrip ini bekerja pada satu baris perintah.
 Lalu skrip akan mencari nama file/direktori dari word/kata yang cocok ("old name") di direktori yang ditentukan.
