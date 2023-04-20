@@ -1,4 +1,4 @@
-# multi rename
+# multi-rename
 
 <img src="https://github.com/XklienZ/multi-rename/blob/master/multi-rename.png" width="480" title="multi-rename">
 <img src="https://github.com/XklienZ/multi-rename/blob/master/multi-rename2.png" width="480" title="multi-rename2">
@@ -12,7 +12,6 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
 **CATAT:** Jalankan skrip ini di direktori defaultnya.
 
 ## OPSI
-```
     -t:                                                                            
         Target direktori yang ingin ditempati.                                
         Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
@@ -25,8 +24,7 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
     -r:
         Targetkan semua word/kata yang cocok.
         skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
-```
-## CARA KERJA SKRIP
+# CARA KERJA SKRIP
     ```./multi-rename [-t] "target direktori" [-a] [-r] "nama file" "nama baru"```
     atau:
     ````./multi-rename [-t] "target direktori" [-d] [-a] [-r] "nama file"```
@@ -37,5 +35,5 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
     mengganti word/kata ("old name") menjadi ("new name") menggunakan substitusi word/kata (pattern  substitution) dari built-in bash.
     Jika opsi -r tidak diaktifkan skrip akan mengganti word/kata yang berada diposisi awal.
 
-## INSTALLATION
-    ```curl -s https://codeload.github.com/XklienZ/multi-rename/legacy.tar.gz/master | tar --recursive-unlink --one-top-level=multi-rename --strip-components=1 --extract --gzip && chmod +x multi-rename/multi_rename;```
+# INSTALLATION
+    curl -s https://codeload.github.com/XklienZ/multi-rename/legacy.tar.gz/master | tar --recursive-unlink --one-top-level=multi-rename --strip-components=1 --extract --gzip && chmod +x multi-rename/multi_rename;
