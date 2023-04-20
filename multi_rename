@@ -1,0 +1,296 @@
+#!/usr/bin/env bash
+
+usage(){
+echo -e "penggunaan:
+$0 [-t] \"target direktori\" [-a] [-r] \"nama file\" \"nama baru\"
+atau:
+$0 [-t] \"target direktori\" [-d] [-a] [-r] \"nama file\"
+
+OPSI:
+  -t:                                                                            
+        Target direktori yang ingin ditempati.                                
+        Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
+        Gunakan opsi ini di argumen pertama.
+    -d:
+        Menghapus sebagian nama file.
+        CATAT: Tidak dapat menghapus pada 1 nama secara keseluruhan (Menghindari nama file yang kosong).
+    -a:
+        Targetkan file dan direktori yang tersembunyi (.).
+    -r:
+        Targetkan semua word/kata yang cocok.
+        skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
+
+Skrip ini berfungsi untuk mengganti sebagian nama file atau  direktori sekaligus, hanya namanya saja.
+Jika opsi -r tidak diaktifkan skrip tidak akan mengganti/menghapus word/kata secara keseluruhan pada sebuah nama file/direktori.";
+}
+
+cache_check(){
+	if [[ -d "$path_cache" ]]; then
+		if [[ -f "$cache_file" ]]; then
+			if [[ -w "$cache_file" ]]; then
+				if ! [[ -r "$cache_file" ]]; then
+					echo "$0: skrip tidak bisa melanjutkan proses karena file cache tidak ada izin akses read (r)";
+					exit 1;
+				fi
+			else
+				echo "$0: skrip tidak bisa melanjutkan proses karena file cache tidak ada izin akses write (w)";
+				exit 1;
+			fi
+		else
+			generate_cache;
+		fi
+	else
+		if mkdir $path_cache; then
+			generate_cache;
+		else
+			echo "$0: '$path_cache': cache untuk skrip tidak bisa dibuat";
+			exit 1;
+		fi
+	fi
+}
+
+generate_cache(){
+	local output="$1";
+
+	while read -r i; do
+		if echo "$i" | grep -F "$filename" &> /dev/null; then
+			getnew "$i" "$filename" "$newname";
+			if [[ "$new" == "." || "$new" == ".." ]]; then
+				echo -en "\e[31mtidak bisa mengganti";
+				echo -En "'$i' -> '$new'";
+				echo -e "karena '$new' adalah nama direktori khusus\e[0m";
+				continue;
+			fi
+
+			if [[ "$i" == "$new" ]]; then
+				continue
+			fi
+
+			if [[ -z "$new" ]]; then
+				echo -en "\e[31mtidak bisa mengganti";
+				echo -En "'$i' -> '$new' karena nama file akan kosong";
+				echo -e "\e[0m";
+				continue;
+			fi
+
+			if [[ "$output" == "output_true" ]]; then
+				echo -E "'$i' -> '$new'";
+			fi
+			echo "$i" >> $cache_file;
+		fi
+	done < <(ls $hidefile)
+
+	if [[ -z "$(cat $cache_file 2> /dev/null)" ]]; then
+		echo "$0: '$filename': tidak ada nama file atau nama direktori seperti itu di '$target_dir'"; 
+		exit 1;
+	fi
+}
+
+overwrite(){
+	local ask;
+
+	if [[ -e "$2" ]]; then
+		echo -en "\e[33m";
+		echo -En "'$1' -> '$2'";
+		echo -en "\e[0m nama itu sudah ada, ingin menimpa? [y/n] ";
+		read ask < /dev/tty;
+		ask=${ask,,};
+		if [[ "${ask:0:1}" != "y" ]]; then
+			return 1;
+		fi
+	fi
+}
+
+main(){
+	local i ask get_backslashfilename;
+
+	if [[ -d "$path_cache" ]]; then
+		if [[ -f "$cache_file" ]]; then
+			rm $cache_file 2> /dev/null;
+		fi
+	else
+		if ! mkdir $path_cache; then
+			echo "$0: '$path_cache': cache untuk skrip tidak bisa dibuat";
+			exit 1;
+		fi
+	fi
+
+	generate_cache "output_true";
+
+	echo -en "\nLanjutkan: [y/n] "; read ask;
+	if [[ "${ask,,}" == "y" ]]; then
+		cache_check;
+		return 0;
+	else
+		echo "$0: Membatalkan";
+		exit 0;
+	fi
+}
+
+remove(){
+	local items;
+
+	while read -r items; do
+		getnew "$items" "$filename";
+		if [[ -n "${new}" ]]; then
+			if [[ -e "$items" ]]; then
+				overwrite "$items" "$new";
+				if (($? == 0)); then
+					mv -v -- "$items" "$new";
+				fi
+			else
+				echo -en "\e[31m";
+				echo -En "'$items': tidak ada nama file atau nama direktori seperti itu";
+				echo -e "\e[0m";
+			fi
+		else
+			echo -en "\e[31mtidak dapat menghapus '$filename' di ";
+			echo -En "'$items' karena nama file akan kosong";
+			echo -e "\e[0m";
+		fi
+	done < <(cat "$cache_file")
+}
+
+rename(){
+	local items;
+
+	while read -r items; do
+		if [[ -e "$items" ]]; then
+			getnew "$items" "$filename" "$newname";
+			overwrite "$items" "$new";
+			if (($? == 0)); then
+				mv -v -- "$items" "$new";
+			fi
+		else
+			echo -en "\e[31m";
+			echo -En "'$items': tidak ada nama file atau nama direktori seperti itu";
+			echo -e "\e[0m";
+		fi
+	done < <(cat "$cache_file")
+}
+
+commandreq=("grep" "mv" "getopts" "realpath" "uname" "basename");
+
+for i in "${commandreq[@]}"; do
+	if ! command -v $i > /dev/null; then
+		echo -e "$0: membutuhkan perintah '$i'";
+		command_notfound=true;
+	fi
+done
+
+if [[ "$command_notfound" == true ]]; then
+	exit 1;
+fi
+
+path_script="$(realpath "$0")";
+path_script="$(dirname "$path_script")";
+namesc="$(basename "$path_script")";
+path_cache="$path_script/.cache_${namesc}";
+cache_file="$path_cache/.${namesc}_cache_file";
+run="rename";
+
+while getopts ':hardt:' opt; do
+	case $opt in 
+		h)
+			usage;
+			exit 0;
+			;;
+		d)
+			run="remove";
+			;;
+		a)
+			hidefile="-A";
+			;;
+		r)
+			recursive=true;
+			;;
+		t)
+			if [[ -d "${OPTARG}" ]]; then
+				target_dir="${OPTARG}";
+			else
+				echo "$0: '$OPTARG': tidak ada direktori seperti itu";
+				exit 1;
+			fi
+
+			if ! [[ -w "$target_dir" ]]; then
+				echo "$0: '$target_dir': direktori tidak mengizinkan akses write (w)";
+				exit 1;
+			fi
+
+			if ! [[ -r "$target_dir" ]]; then
+				echo "$0: '$target_dir': direktori tidak mengizinkan akses read (r)";
+				exit 1;
+			fi
+
+			if ! cd $target_dir; then
+				echo "$0: gagal masuk direktori '$target_dir'";
+				exit 1;
+			fi
+			;;
+		\?)
+			echo "$0: opsi tidak valid: -$OPTARG";
+			echo "coba '$0 -h' untuk informasi lebih lanjut";
+			exit 1;
+			;;
+		*)
+			echo "$0: opsi -${OPTARG} membutuhkan argumen";
+			echo "coba '$0 -h' untuk informasi lebih lanjut";
+			exit 1;
+			;;
+	esac
+done
+
+shift $((OPTIND-1));
+filename="$1";
+newname="$2";
+
+if [[ -z "$filename" && "$run" == "remove" ]]; then
+	echo "Penggunaan: $0 [-d] [-a] [-w] 'NAMA FILE'";
+	echo "coba '$0 -h' untuk informasi lebih lanjut";
+	exit 1;
+fi
+
+if [[ "$run" == "rename" ]]; then
+	if [[ -z "$filename" || -z "$newname" ]]; then
+		echo "Penggunaan: $0 [-a] [-w] 'nama file' 'nama baru'";
+		echo "coba '$0 -h' untuk informasi lebih lanjut";
+		exit 1;
+	fi
+fi
+
+case "$run" in
+	rename)
+		if ((${#newname} > 255)); then
+			echo "$0: nama terlalu panjang";
+			exit 1;
+		fi
+
+		if [[ ! "$newname" =~ ^[[:alnum:]._-]+$ ]]; then
+			echo "$0: '$newname': hanya mendukung karakter huruf spasi angka _ . -";
+			exit 1;
+		fi
+
+		if [[ "${filename}" == "${newname}" ]]; then
+			echo "$0: '$filename' dan '$newname' adalah argumen yang sama";
+			exit 1;
+		fi
+
+		if [[ $recursive == true ]]; then
+			getnew(){ new="${1//$2/$3}"; }
+		else
+			getnew(){ new="${1/$2/$3}"; }		
+		fi	
+		main;
+		rename;
+		;;
+
+	remove)
+		if [[ $recursive == true ]]; then
+			getnew(){ new="${1//$2}"; }
+		else
+			getnew(){ new="${1/$2}"; }	
+		fi
+		main;
+		remove;
+		;;
+esac
