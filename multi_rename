@@ -14,7 +14,7 @@ OPSI:
         Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
         Gunakan opsi ini di argumen pertama.
     -d:
-        Menghapus sebagian nama file.
+        Bukan mengganti sebagian nama file, tapi menghapusnya.
         CATAT: Tidak dapat menghapus pada 1 nama secara keseluruhan (Menghindari nama file yang kosong).
     -a:
         Targetkan file dan direktori yang tersembunyi (.).
