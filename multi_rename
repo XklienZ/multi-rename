@@ -21,6 +21,8 @@ OPSI:
     -r:
         Targetkan semua word/kata yang cocok.
         skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
+	-c:
+		character class only. Menargertkan nama file dengan character class.
 
 Skrip ini berfungsi untuk mengganti sebagian nama file atau  direktori sekaligus, hanya namanya saja.
 Jika opsi -r tidak diaktifkan skrip tidak akan mengganti/menghapus word/kata secara keseluruhan pada sebuah nama file/direktori.";
@@ -55,7 +57,7 @@ generate_cache(){
 	local output="$1";
 
 	while read -r i; do
-		if echo "$i" | grep -F "$filename" &> /dev/null; then
+		if echo "$i" | grep $fixed_string "$filename" &> /dev/null; then
 			getnew "$i" "$filename" "$newname";
 			if [[ "$new" == "." || "$new" == ".." ]]; then
 				echo -en "\e[31mtidak bisa mengganti";
@@ -100,6 +102,30 @@ overwrite(){
 		if [[ "${ask:0:1}" != "y" ]]; then
 			return 1;
 		fi
+	fi
+}
+
+character_class(){
+	local i arg char_match; 
+	local list_class=("alnum" "alpha" "blank" "cntrl" "digit" "graph" "lower" "print" "punct" "space" "upper" "xdigit");
+	arg="$1";
+	
+	if [[ "$arg" =~ ^\[\[\:[a-z]+\:\]\]$ ]]; then
+		for ((i=0; i<${#list_class[@]}; i++)); do
+			if [[ "${arg//[^a-z]}" == "${list_class[$i]}" ]]; then
+				char_match=true;
+			fi
+		done
+	else
+		echo -e "$0: invalid character class\ncontoh: [[:alnum:]]";
+		exit 1;
+	fi
+
+	if [[ "$char_match" == true ]]; then
+		fixed_string='';
+	else
+		echo -e "$0: character class yang didukung:\n${list_class[@]}";
+		exit 1;
 	fi
 }
 
@@ -190,8 +216,9 @@ namesc="$(basename "$path_script")";
 path_cache="$path_script/.cache_${namesc}";
 cache_file="$path_cache/.${namesc}_cache_file";
 run="rename";
+fixed_string='-F';
 
-while getopts ':hardt:' opt; do
+while getopts ':hardct:' opt; do
 	case $opt in 
 		h)
 			usage;
@@ -205,6 +232,9 @@ while getopts ':hardt:' opt; do
 			;;
 		r)
 			recursive=true;
+			;;
+		c)
+			charc=true;
 			;;
 		t)
 			if [[ -d "${OPTARG}" ]]; then
@@ -245,6 +275,10 @@ done
 shift $((OPTIND-1));
 filename="$1";
 newname="$2";
+
+if [[ "$charc" == true ]]; then
+	character_class "$filename";
+fi
 
 if [[ -z "$filename" && "$run" == "remove" ]]; then
 	echo "Penggunaan: $0 [-d] [-a] [-w] 'NAMA FILE'";
