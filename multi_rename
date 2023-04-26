@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#Hello XZ: https://xklienz.github.io
+
 usage(){
 echo -e "penggunaan:
 $0 [-t] \"target direktori\" [-a] [-r] \"nama file\" \"nama baru\"
