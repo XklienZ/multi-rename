@@ -7,7 +7,7 @@ atau:
 $0 [-t] \"target direktori\" [-d] [-a] [-r] \"nama file\"
 
 OPSI:
-  -t:                                                                            
+	-t:                                                                            
         Target direktori yang ingin ditempati.                                
         Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
         Gunakan opsi ini di argumen pertama.
@@ -222,7 +222,7 @@ while getopts ':hardt:' opt; do
 				exit 1;
 			fi
 
-			if ! cd $target_dir; then
+			if ! cd "$target_dir"; then
 				echo "$0: gagal masuk direktori '$target_dir'";
 				exit 1;
 			fi
