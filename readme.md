@@ -25,6 +25,9 @@ Berhati-hati jika Anda ingin mengganti karakter spesial dalam nama file.
 -r:
     Targetkan semua word/kata yang cocok.
     skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
+-c:
+    character class only. Menargertkan nama file dengan character class.
+
 ```
 # CARA KERJA SKRIP
     ./multi-rename [-t] "target direktori" [-a] [-r] "nama file" "nama baru"
