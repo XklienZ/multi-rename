@@ -21,7 +21,7 @@ OPSI:
     -r:
         Targetkan semua word/kata yang cocok.
         skrip akan mengganti/menghapus word/kata yang cocok secara keseluruhan pada sebuah nama file/direktori.
-	-c:
+    -c:
 		character class only. Menargertkan nama file dengan character class.
 
 Skrip ini berfungsi untuk mengganti sebagian nama file atau  direktori sekaligus, hanya namanya saja.
