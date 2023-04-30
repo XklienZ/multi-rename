@@ -9,7 +9,7 @@ atau:
 $0 [-t] \"target direktori\" [-d] [-a] [-r] \"nama file\"
 
 OPSI:
-	-t:                                                                            
+    -t:                                                                            
         Target direktori yang ingin ditempati.                                
         Jika opsi -t di non-aktifkan, skrip akan menargetkan direktori yang sedang ditempati sekarang.
         Gunakan opsi ini di argumen pertama.
