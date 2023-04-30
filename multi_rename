@@ -301,7 +301,7 @@ case "$run" in
 			exit 1;
 		fi
 
-		if [[ ! "$newname" =~ ^[[:alnum:]._-]+$ ]]; then
+		if [[ ! "$newname" =~ ^[[:blank:][:alnum:]._-]+$ ]]; then
 			echo "$0: '$newname': hanya mendukung karakter huruf spasi angka _ . -";
 			exit 1;
 		fi
