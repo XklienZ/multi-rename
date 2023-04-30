@@ -70,7 +70,7 @@ generate_cache(){
 				continue
 			fi
 
-			if [[ -z "$new" ]]; then
+			if [[ -z "$new" || "$new" =~ ^[[:blank:]]+$ ]]; then
 				echo -en "\e[31mtidak bisa mengganti";
 				echo -En "'$i' -> '$new' karena nama file akan kosong";
 				echo -e "\e[0m";
